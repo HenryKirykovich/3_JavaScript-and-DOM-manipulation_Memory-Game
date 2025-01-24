@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="style.css" />
+
+    <title>Memory Game</title>
+</head>
+
+<body>
+
+
+    <div class="flex-container">
+        <h1>Memory Game</h1>
+        <p>Rules: please choose closed card, when you chose the match your score increse.</p>
+
+        <div class="button-container">
+
+            <select id="difficulty" name="difficulty">
+                <option value="4">Easy (4x4)</option>
+                <option value="6">Hard (6x6)</option>         
+            </select>
+            <br><br>
+            <button type="button" id="start">New Game</button>
+        </div>
+
+        <div class="info-container">
+            <p id="my_text">Moves: 0</p>
+
+            <p id="timer">Time: 00:00</p>
+        </div>
+
+
+
+
+        <div class="grid-container" id="grid-container">
+
+
+        </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>
