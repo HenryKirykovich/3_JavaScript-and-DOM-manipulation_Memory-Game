@@ -11,11 +11,13 @@ let timerInterval;
 let timeElapsed = 0;
 
 // Load audio files for sound effects
-
 const flip = new Audio('assets/sounds/match.mp3'); // Sound for matching cards
 const mismatchSound = new Audio('assets/sounds/mismatch.mp3'); // Sound for mismatched cards
 const winnerBell = new Audio('assets/sounds/winner.mp3')
-    // Start a new game
+
+
+
+// Start a new game
 startButton.addEventListener('click', function() {
     // Reset game state
     message.textContent = ""; // Clear message
@@ -30,6 +32,8 @@ startButton.addEventListener('click', function() {
     setupGame(gridSize * gridSize); // Create a grid with the specified size
     startTimer(); // Start the timer
 });
+
+
 
 // Clear the grid
 function clearGrid() {
@@ -55,6 +59,8 @@ function setupGame(number) {
 function generateCardValues(number) {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; // List of letters
     const numPairs = number / 2; // Calculate how many pairs are needed
+
+
     const values = Array.from({ length: numPairs }, (_, i) => alphabet[i]); // Take the first N letters
     return [...values, ...values]; // Duplicate letters for pairs
 }
