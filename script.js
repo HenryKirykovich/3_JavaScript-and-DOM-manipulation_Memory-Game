@@ -1,8 +1,11 @@
+//  !!! used here DOM concept:  call my document > referencing HTML Element > variable  !!!
+// 
 const startButton = document.getElementById('start');
 const message = document.getElementById('my_text');
 const gridContainer = document.getElementById('grid-container');
 const difficultySelect = document.getElementById('difficulty');
 const timerDisplay = document.getElementById('timer');
+// 
 
 let flippedCards = [];
 let moves = 0;
@@ -17,17 +20,20 @@ const winnerBell = new Audio('assets/sounds/winner.mp3')
 
 
 
-// Start a new game
+// Start a new game      
+
+// !!! used Listener for activating anonymous function > activating working match process !! //
+
 startButton.addEventListener('click', function() {
     // Reset game state
-    message.textContent = ""; // Clear message
+    message.textContent = ""; // Clear message  //  DOM Manipulation
     clearGrid(); // Clear the grid
     clearInterval(timerInterval); // Stop any existing timer
     timeElapsed = 0; // Reset timer
     moves = 0; // Reset move counter
     flippedCards = []; // Reset flipped cards array
     const gridSize = parseInt(difficultySelect.value); // Get selected grid size
-    gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+    gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`; // !!! used DOM  > assigning style via JS !!! //
     gridContainer.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
     setupGame(gridSize * gridSize); // Create a grid with the specified size
     startTimer(); // Start the timer
@@ -37,7 +43,7 @@ startButton.addEventListener('click', function() {
 
 // Clear the grid
 function clearGrid() {
-    gridContainer.innerHTML = '';
+    gridContainer.innerHTML = ''; // typical DOM manipulation > assigning empty string to HTML Document //
 }
 
 // Setup the game
@@ -55,17 +61,19 @@ function setupGame(number) {
     }
 }
 
-// Generate card values (pairs of letters)
+// Generate card values (pairs of letters) // !!! used Functional Programming Concept > taking number > produced array with pair letters !!! 
 function generateCardValues(number) {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'; // List of letters
     const numPairs = number / 2; // Calculate how many pairs are needed
 
 
     const values = Array.from({ length: numPairs }, (_, i) => alphabet[i]); // Take the first N letters
-    return [...values, ...values]; // Duplicate letters for pairs
+
+    // !!! used  ES6  Spreding  !!! 
+    return [...values, ...values]; // Duplicate letters for pairs    
 }
 
-// Shuffle an array
+// Shuffle an array  // !!! Functional Programming !!!
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -77,11 +85,11 @@ function shuffle(array) {
 function startTimer() {
     timerDisplay.textContent = `Time: 00:00`; // Reset timer display
 
-    timerInterval = setInterval(() => {
+    timerInterval = setInterval(() => { // !!! ES6 concepts > lambda functions !!!///
         timeElapsed++;
         const minutes = Math.floor(timeElapsed / 60);
         const seconds = timeElapsed % 60;
-        timerDisplay.textContent = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        timerDisplay.textContent = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; // !!! ES6 concepts > Template Literals !!!///
     }, 1000);
 }
 
@@ -120,7 +128,7 @@ function checkMatch() {
         winnerBell.play(); // Play match sound
     } else {
         // Cards do not match
-        setTimeout(() => {
+        setTimeout(() => { // !!! ES6 concepts > lambda functions !!!///
             mismatchSound.play(); // Play mismatch sound
             card1.classList.remove('flipped');
             card2.classList.remove('flipped');
@@ -135,10 +143,21 @@ function checkMatch() {
 }
 
 // Check if all pairs are matched
+// function checkWin() {
+// const allMatched = document.querySelectorAll('.card.matched').length === cards.length;
+// const totalCards = gridContainer.children.length;
+// if (allMatched) {
+// stopTimer(); // Stop the timer when the game is won
+// message.textContent = `You win! Moves: ${moves}`;
+// }
+// }
+// 
 function checkWin() {
-    const allMatched = document.querySelectorAll('.card.matched').length === cards.length;
-    if (allMatched) {
-        stopTimer(); // Stop the timer when the game is won
-        message.textContent = `You win! Moves: ${moves}`;
+    const matchedCards = document.querySelectorAll('.card.matched').length;
+    if (matchedCards === cards.length) { // Check if all cards are matched
+        stopTimer(); // Stop the timer
+        setTimeout(() => {
+            alert(`Game Over! You won in ${moves} moves and ${timeElapsed} seconds.`); // Game Over message
+        }, 500); // Slight delay for alert
     }
 }
