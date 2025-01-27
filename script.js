@@ -142,16 +142,6 @@ function checkMatch() {
     message.textContent = `Moves: ${moves}`; // Update message with move count
 }
 
-// Check if all pairs are matched
-// function checkWin() {
-// const allMatched = document.querySelectorAll('.card.matched').length === cards.length;
-// const totalCards = gridContainer.children.length;
-// if (allMatched) {
-// stopTimer(); // Stop the timer when the game is won
-// message.textContent = `You win! Moves: ${moves}`;
-// }
-// }
-// 
 function checkWin() {
     const matchedCards = document.querySelectorAll('.card.matched').length;
     if (matchedCards === cards.length) { // Check if all cards are matched
