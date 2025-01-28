@@ -21,7 +21,6 @@ A simple memory game built with HTML, CSS, and JavaScript. Match pairs of cards 
 - CSS
 - JavaScript (ES6)
 
-## Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/memory-game.git
+
+
+
