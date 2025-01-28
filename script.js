@@ -146,8 +146,8 @@ function checkWin() {
     const matchedCards = document.querySelectorAll('.card.matched').length;
     if (matchedCards === cards.length) { // Check if all cards are matched
         stopTimer(); // Stop the timer
-        setTimeout(() => {
-            alert(`Game Over! You won in ${moves} moves and ${timeElapsed} seconds.`); // Game Over message
-        }, 500); // Slight delay for alert
+        const gameOverMessage = document.getElementById('game-over-message');
+        gameOverMessage.textContent = `Game Over! You won in ${moves} moves and ${timeElapsed} seconds.`; // Display the message
+
     }
 }
