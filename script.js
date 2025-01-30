@@ -91,17 +91,33 @@ function shuffle(array) {
 }
 
 // Start the timer
-function startTimer() {
-    timerDisplay.textContent = `Time: 00:00`; // Reset timer display
+// function startTimer() {
+// timerDisplay.textContent = `Time: 00:00`; // Reset timer display
+// 
+// timerInterval = setInterval(() => { // !!! ES6 concepts > lambda functions !!!///
+// timeElapsed++;
+// sessionStorage.setItem('timer', timeElapsed); //!!! addition for Week 4  Save timer in session storage
+// const minutes = Math.floor(timeElapsed / 60);
+// const seconds = timeElapsed % 60;
+// timerDisplay.textContent = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; // !!! ES6 concepts > Template Literals !!!///
+// }, 1000);
+// }
 
-    timerInterval = setInterval(() => { // !!! ES6 concepts > lambda functions !!!///
+
+function startTimer() {
+    if (sessionStorage.getItem('timer')) {
+        timeElapsed = parseInt(sessionStorage.getItem('timer')); // Restore time
+    }
+
+    timerInterval = setInterval(() => {
         timeElapsed++;
-        sessionStorage.setItem('timer', timeElapsed); //!!! addition for Week 4  Save timer in session storage
+        sessionStorage.setItem('timer', timeElapsed); // Store timer in sessionStorage
         const minutes = Math.floor(timeElapsed / 60);
         const seconds = timeElapsed % 60;
-        timerDisplay.textContent = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; // !!! ES6 concepts > Template Literals !!!///
+        timerDisplay.textContent = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }, 1000);
 }
+
 
 // Stop the timer
 function stopTimer() {
@@ -148,11 +164,11 @@ function checkMatch() {
         }, 1000); // 1-second delay
     }
 
-    moves++; // Increment move counter
-    message.textContent = `Moves: ${moves}`; // Update message with move count
-
-    localStorage.setItem('totalMoves', totalMoves); // addition for Week 4  Store total moves in LocalStorage
-    saveGameState(); // Save game state
+    moves++; // Increment current game move counter
+    totalMoves++; // Increment total moves across all sessions
+    message.textContent = `Moves: ${moves}`;
+    localStorage.setItem('totalMoves', totalMoves); // Store total moves in LocalStorage
+    saveGameState(); // Save current game state
 
 
 }
