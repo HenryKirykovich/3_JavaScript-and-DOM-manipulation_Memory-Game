@@ -1,4 +1,4 @@
-// 🎯 Select essential elements
+// 🎯 Select game elements
 const startButton = document.getElementById('start');
 const message = document.getElementById('my_text');
 const gridContainer = document.getElementById('grid-container');
@@ -12,50 +12,48 @@ let cards = [];
 let timerInterval;
 let timeElapsed = 0;
 
-// Retrieve total moves from localStorage
+// 🎯 Load saved moves count
 let totalMoves = localStorage.getItem('totalMoves') ? parseInt(localStorage.getItem('totalMoves')) : 0;
 
-// 🎯 Load audio files
+// 🎯 Load sounds
 const flip = new Audio('assets/sounds/match.mp3');
 const mismatchSound = new Audio('assets/sounds/mismatch.mp3');
 const winnerBell = new Audio('assets/sounds/winner.mp3');
 
-// 📌 Event listener for starting a new game
-startButton.addEventListener('click', function() {
-    // Clear saved game state
-    localStorage.removeItem("cardStates");
-    localStorage.removeItem("timer");
-    sessionStorage.removeItem("gameState"); // Ensure session storage is cleared
-
-    // Reset game variables
-    message.textContent = ""; // Clear message
-    clearGrid(); // Clear the grid
-    clearInterval(timerInterval); // Stop any existing timer
-    timeElapsed = 0;
-    moves = 0;
-    flippedCards = [];
-
-    // Set grid size based on difficulty
-    const gridSize = parseInt(difficultySelect.value);
-    gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
-    gridContainer.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
-
-    // Setup the game
-    setupGame(gridSize * gridSize);
-    startTimer();
-});
-
-// 📌 Load game state on page load
+// 📌 Load game state on page refresh
 document.addEventListener("DOMContentLoaded", function() {
     loadGameState();
 });
 
-// 🎯 Function to clear the grid
+// 📌 New Game Button - Reset Game State
+startButton.addEventListener('click', function() {
+    // Clear stored game state
+    localStorage.removeItem("cardStates");
+    localStorage.removeItem("timer");
+    sessionStorage.removeItem("gameState");
+
+    // Reset variables
+    clearGrid();
+    clearInterval(timerInterval);
+    timeElapsed = 0;
+    moves = 0;
+    flippedCards = [];
+
+    // Get grid size & setup new game
+    const gridSize = parseInt(difficultySelect.value);
+    gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
+    gridContainer.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
+
+    setupGame(gridSize * gridSize);
+    startTimer();
+});
+
+// 📌 Function to clear the grid
 function clearGrid() {
     gridContainer.innerHTML = '';
 }
 
-// 🎯 Function to setup the game board
+// 📌 Function to setup the game board
 function setupGame(number) {
     cards = generateCardValues(number);
     shuffle(cards);
@@ -68,19 +66,18 @@ function setupGame(number) {
         gridContainer.appendChild(card);
     }
 
-    // Restore saved game state if available
-    restoreGameState();
+    restoreGameState(); // Restore previous game state if available
 }
 
-// 🎯 Function to generate pairs of card values (letters)
+// 📌 Generate unique pairs of card values
 function generateCardValues(number) {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const numPairs = number / 2;
     const values = Array.from({ length: numPairs }, (_, i) => alphabet[i]);
-    return [...values, ...values]; // Duplicate letters for pairs
+    return [...values, ...values];
 }
 
-// 🎯 Function to shuffle an array (Fisher-Yates shuffle)
+// 📌 Shuffle the cards
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -88,10 +85,10 @@ function shuffle(array) {
     }
 }
 
-// 🎯 Function to start the timer
+// 📌 Start the timer
 function startTimer() {
     if (sessionStorage.getItem('timer')) {
-        timeElapsed = parseInt(sessionStorage.getItem('timer')); // Restore time
+        timeElapsed = parseInt(sessionStorage.getItem('timer'));
     }
 
     timerInterval = setInterval(() => {
@@ -103,12 +100,12 @@ function startTimer() {
     }, 1000);
 }
 
-// 🎯 Function to stop the timer
+// 📌 Stop the timer
 function stopTimer() {
     clearInterval(timerInterval);
 }
 
-// 🎯 Function to flip a card
+// 📌 Flip a card
 function flipCard() {
     if (flippedCards.length >= 2 || this.classList.contains('matched')) return;
 
@@ -122,7 +119,7 @@ function flipCard() {
     }
 }
 
-// 🎯 Function to check if two flipped cards match
+// 📌 Check if two flipped cards match
 function checkMatch() {
     const [card1, card2] = flippedCards;
 
@@ -150,7 +147,7 @@ function checkMatch() {
     saveGameState();
 }
 
-// 🎯 Function to check if all pairs are matched
+// 📌 Check if the player has won
 function checkWin() {
     const matchedCards = document.querySelectorAll('.card.matched').length;
     if (matchedCards === cards.length) {
@@ -160,18 +157,19 @@ function checkWin() {
     }
 }
 
-// 🎯 Function to save the game state
+// 📌 Save the current game state
 function saveGameState() {
     const cardStates = Array.from(document.querySelectorAll(".card")).map(card => ({
         letter: card.innerText,
-        flipped: card.classList.contains("flipped")
+        flipped: card.classList.contains("flipped"),
+        matched: card.classList.contains("matched")
     }));
 
     localStorage.setItem("cardStates", JSON.stringify(cardStates));
-    localStorage.setItem("timer", document.getElementById("timer").innerText);
+    localStorage.setItem("timer", timeElapsed);
 }
 
-// 🎯 Function to load saved game state
+// 📌 Load the saved game state
 function loadGameState() {
     let savedCards = JSON.parse(localStorage.getItem("cardStates"));
     let savedTime = localStorage.getItem("timer");
@@ -184,15 +182,19 @@ function loadGameState() {
             if (savedCards[index].flipped) {
                 card.classList.add("flipped");
             }
+            if (savedCards[index].matched) {
+                card.classList.add("matched");
+            }
         });
     }
 
     if (savedTime) {
-        document.getElementById("timer").innerText = savedTime;
+        timeElapsed = parseInt(savedTime);
+        document.getElementById("timer").innerText = `Time: ${Math.floor(timeElapsed / 60)}:${String(timeElapsed % 60).padStart(2, '0')}`;
     }
 }
 
-// 🎯 Function to restore game state from sessionStorage
+// 📌 Restore previous game state (on refresh)
 function restoreGameState() {
     const savedState = JSON.parse(sessionStorage.getItem('gameState'));
 
