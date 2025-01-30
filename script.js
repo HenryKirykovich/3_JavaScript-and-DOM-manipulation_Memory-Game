@@ -167,6 +167,16 @@ function checkWin() {
     }
 }
 
+// !!! Save Game State in SessionStorage !!!
+function saveGameState() {
+    const gameState = {
+        moves: moves, // Save current moves
+        timeElapsed: timeElapsed, // Save timer state
+        flippedCards: Array.from(document.querySelectorAll('.card.flipped')).map(card => card.dataset.index),
+        matchedCards: Array.from(document.querySelectorAll('.card.matched')).map(card => card.dataset.index)
+    };
+    sessionStorage.setItem('gameState', JSON.stringify(gameState)); // Store game state
+}
 
 // !!! Load game state on refresh using SessionStorage !!!
 function loadGameState() {
