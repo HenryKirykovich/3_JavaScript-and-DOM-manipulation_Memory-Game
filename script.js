@@ -12,7 +12,7 @@ let moves = 0;
 let cards = [];
 let timerInterval;
 let timeElapsed = 0;
-let totalMovies = localStorage.getItem('totalMoves') ? parseInt(localStorage.getItem('totalMoves')) : 0; // !!! retrieved value + check value + parse value to string  by ternary expression !!! //
+let totalMoves = localStorage.getItem('totalMoves') ? parseInt(localStorage.getItem('totalMoves')) : 0; // !!! retrieved value + check value + parse value to string  by ternary expression !!! //
 
 
 // !!! Load game state on page refresh using SessionStorage !!!
