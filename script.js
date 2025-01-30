@@ -1,4 +1,4 @@
-// 🎯 Select game elements
+//  Select game elements
 const startButton = document.getElementById('start');
 const message = document.getElementById('my_text');
 const gridContainer = document.getElementById('grid-container');
