@@ -12,6 +12,12 @@ let moves = 0;
 let cards = [];
 let timerInterval;
 let timeElapsed = 0;
+let totalMovies = localStorage.getItem('totalMoves') ? parseInt(localStorage.getItem('totalMoves')) : 0; // !!! retrieved value + check value + parse value to string  by ternary expression !!! //
+
+
+// !!! Load game state on page refresh using SessionStorage !!!
+document.addEventListener('DOMContentLoaded', loadGameState);
+
 
 // Load audio files for sound effects
 const flip = new Audio('assets/sounds/match.mp3'); // Sound for matching cards
@@ -59,6 +65,9 @@ function setupGame(number) {
         card.addEventListener('click', flipCard); // Add click event listener
         gridContainer.appendChild(card); // Add card to the grid container
     }
+
+    // !!! Restore game state if available
+    restoreGameState();
 }
 
 // Generate card values (pairs of letters) // !!! used Functional Programming Concept > taking number > produced array with pair letters !!! 
@@ -87,6 +96,7 @@ function startTimer() {
 
     timerInterval = setInterval(() => { // !!! ES6 concepts > lambda functions !!!///
         timeElapsed++;
+        sessionStorage.setItem('timer', timeElapsed); //!!! addition for Week 4  Save timer in session storage
         const minutes = Math.floor(timeElapsed / 60);
         const seconds = timeElapsed % 60;
         timerDisplay.textContent = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`; // !!! ES6 concepts > Template Literals !!!///
@@ -140,6 +150,11 @@ function checkMatch() {
 
     moves++; // Increment move counter
     message.textContent = `Moves: ${moves}`; // Update message with move count
+
+    localStorage.setItem('totalMoves', totalMoves); // addition for Week 4  Store total moves in LocalStorage
+    saveGameState(); // Save game state
+
+
 }
 
 function checkWin() {
@@ -149,5 +164,39 @@ function checkWin() {
         const gameOverMessage = document.getElementById('game-over-message');
         gameOverMessage.textContent = `Game Over! You won in ${moves} moves and ${timeElapsed} seconds.`; // Display the message
 
+    }
+}
+
+
+// !!! Load game state on refresh using SessionStorage !!!
+function loadGameState() {
+    if (sessionStorage.getItem('gameState')) {
+        restoreGameState();
+    }
+}
+
+
+// !!! Restore game state after page refresh !!!
+function restoreGameState() {
+    const savedState = JSON.parse(sessionStorage.getItem('gameState'));
+
+    if (savedState) {
+        moves = savedState.moves;
+        timeElapsed = savedState.timeElapsed;
+        message.textContent = `Moves: ${moves}`;
+
+        startTimer();
+
+        document.querySelectorAll('.card').forEach(card => {
+            const index = card.dataset.index;
+            if (savedState.flippedCards.includes(index)) {
+                card.classList.add('flipped');
+                card.textContent = card.dataset.value;
+            }
+            if (savedState.matchedCards.includes(index)) {
+                card.classList.add('matched');
+                card.textContent = card.dataset.value;
+            }
+        });
     }
 }
