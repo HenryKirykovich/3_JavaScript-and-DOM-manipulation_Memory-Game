@@ -7,6 +7,17 @@ const difficultySelect = document.getElementById('difficulty');
 const timerDisplay = document.getElementById('timer');
 // 
 
+// Check localStorage Before Loading Game
+document.addEventListener("DOMContentLoaded", function() {
+    if (localStorage.getItem("gameState")) {
+        console.log("Saved game found. Restoring...");
+        loadGameState(); // Restore the game state if available
+    } else {
+        console.log("No saved game found. Starting fresh...");
+        startNewGame(); // Start a new game if no saved data
+    }
+});
+
 let flippedCards = [];
 let moves = 0;
 let cards = [];
@@ -19,46 +30,51 @@ const mismatchSound = new Audio('assets/sounds/mismatch.mp3'); // Sound for mism
 const winnerBell = new Audio('assets/sounds/winner.mp3')
 
 
-
-// Start a new game      
-
-// !!! used Listener for activating anonymous function > activating working match process !! //
-
-startButton.addEventListener('click', function() {
+function startNewGame() {
     // Reset game state
-    message.textContent = ""; // Clear message  //  DOM Manipulation
-    clearGrid(); // Clear the grid
-    clearInterval(timerInterval); // Stop any existing timer
-    timeElapsed = 0; // Reset timer
-    moves = 0; // Reset move counter
-    flippedCards = []; // Reset flipped cards array
-    const gridSize = parseInt(difficultySelect.value); // Get selected grid size
-    gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`; // !!! used DOM  > assigning style via JS !!! //
+    message.textContent = "";
+    clearGrid();
+    clearInterval(timerInterval);
+    timeElapsed = 0;
+    moves = 0;
+    flippedCards = [];
+
+    const gridSize = parseInt(difficultySelect.value); // Get grid size
+    gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`;
     gridContainer.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
-    setupGame(gridSize * gridSize); // Create a grid with the specified size
-    startTimer(); // Start the timer
-});
 
-
-
-// Clear the grid
-function clearGrid() {
-    gridContainer.innerHTML = ''; // typical DOM manipulation > assigning empty string to HTML Document //
+    setupGame(gridSize * gridSize);
+    startTimer();
 }
 
-// Setup the game
+
+// Define `setupGame()` BEFORE it is called
 function setupGame(number) {
     cards = generateCardValues(number); // Generate card values
     shuffle(cards); // Shuffle the card values
 
-    // Create cards and add them to the grid
+    // Clear the grid before creating a new one
+    clearGrid();
+
     for (let i = 0; i < number; i++) {
-        const card = document.createElement('div');
-        card.className = 'item card'; // Add CSS classes
-        card.dataset.value = cards[i]; // Assign value to the card
-        card.addEventListener('click', flipCard); // Add click event listener
-        gridContainer.appendChild(card); // Add card to the grid container
+        const card = document.createElement("div");
+        card.className = "item card";
+        card.dataset.value = cards[i];
+        card.dataset.index = i; // Assign a unique index
+
+        card.addEventListener("click", flipCard);
+        gridContainer.appendChild(card);
     }
+}
+
+//Start Button Listener (Triggers New Game)
+startButton.addEventListener('click', startNewGame);
+
+
+// Clear Grid Function
+
+function clearGrid() {
+    gridContainer.innerHTML = ''; // typical DOM manipulation > assigning empty string to HTML Document //
 }
 
 // Generate card values (pairs of letters) // !!! used Functional Programming Concept > taking number > produced array with pair letters !!! 
@@ -72,6 +88,8 @@ function generateCardValues(number) {
     // !!! used  ES6  Spreding  !!! 
     return [...values, ...values]; // Duplicate letters for pairs    
 }
+
+
 
 // Shuffle an array  // !!! Functional Programming !!!
 function shuffle(array) {
@@ -93,26 +111,62 @@ function startTimer() {
     }, 1000);
 }
 
-// Stop the timer
+// Stop Timer Function
+
 function stopTimer() {
     clearInterval(timerInterval);
 }
 
-// Flip a card
+
+
+// !!! used Listener for activating anonymous function > activating working match process !! //
+
+startButton.addEventListener('click', function() {
+    // Reset game state
+    message.textContent = ""; // Clear message  //  DOM Manipulation
+    clearGrid(); // Clear the grid
+    clearInterval(timerInterval); // Stop any existing timer
+    timeElapsed = 0; // Reset timer
+    moves = 0; // Reset move counter
+    flippedCards = []; // Reset flipped cards array
+    const gridSize = parseInt(difficultySelect.value); // Get selected grid size
+    gridContainer.style.gridTemplateColumns = `repeat(${gridSize}, 1fr)`; // !!! used DOM  > assigning style via JS !!! //
+    gridContainer.style.gridTemplateRows = `repeat(${gridSize}, 1fr)`;
+    setupGame(gridSize * gridSize); // Create a grid with the specified size
+    startTimer(); // Start the timer
+});
+
+
+// Flip Card Function(Handles Click Event)
+
 function flipCard() {
-    // Ignore clicks if 2 cards are already flipped or the card is already matched
     if (flippedCards.length >= 2 || this.classList.contains('matched')) return;
 
-    flip.play();
-    this.classList.add('flipped'); // Add 'flipped' class
-    this.textContent = this.dataset.value; // Show card value
-    flippedCards.push(this); // Add card to flippedCards array
+    flip.play(); // Play flip sound
+    this.classList.add('flipped');
+    this.textContent = this.dataset.value;
+    flippedCards.push(this);
 
-    // If two cards are flipped, check for a match
     if (flippedCards.length === 2) {
         checkMatch();
     }
 }
+
+// Flip Card Function(Handles Click Event)
+
+function flipCard() {
+    if (flippedCards.length >= 2 || this.classList.contains('matched')) return;
+
+    flip.play(); // Play flip sound
+    this.classList.add('flipped');
+    this.textContent = this.dataset.value;
+    flippedCards.push(this);
+
+    if (flippedCards.length === 2) {
+        checkMatch();
+    }
+}
+
 
 // Check if two flipped cards match
 function checkMatch() {
@@ -142,6 +196,7 @@ function checkMatch() {
     message.textContent = `Moves: ${moves}`; // Update message with move count
 }
 
+
 function checkWin() {
     const matchedCards = document.querySelectorAll('.card.matched').length;
     if (matchedCards === cards.length) { // Check if all cards are matched
@@ -151,3 +206,53 @@ function checkWin() {
 
     }
 }
+
+
+
+// Save Game State(localStorage)
+
+function saveGameState() {
+    const gameState = {
+        moves: moves,
+        timeElapsed: timeElapsed,
+        flippedCards: flippedCards.map(card => card.dataset.index),
+        matchedCards: Array.from(document.querySelectorAll(".card.matched")).map(card => card.dataset.index)
+    };
+
+    localStorage.setItem("gameState", JSON.stringify(gameState));
+}
+
+// Load Game State(localStorage)
+
+function loadGameState() {
+    const savedGameState = JSON.parse(localStorage.getItem("gameState"));
+
+    if (savedGameState) {
+        moves = savedGameState.moves;
+        timeElapsed = savedGameState.timeElapsed;
+        message.textContent = `Moves: ${moves}`;
+
+        setupGame(savedGameState.gridSize);
+        startTimer();
+    }
+}
+
+// Clear the grid
+// function clearGrid() {
+// gridContainer.innerHTML = ''; // typical DOM manipulation > assigning empty string to HTML Document //
+// }
+
+// Setup the game
+// function setupGame(number) {
+// cards = generateCardValues(number); // Generate card values
+// shuffle(cards); // Shuffle the card values
+// 
+// Create cards and add them to the grid
+// for (let i = 0; i < number; i++) {
+// const card = document.createElement('div');
+// card.className = 'item card'; // Add CSS classes
+// card.dataset.value = cards[i]; // Assign value to the card
+// card.addEventListener('click', flipCard); // Add click event listener
+// gridContainer.appendChild(card); // Add card to the grid container
+// }
+// }
