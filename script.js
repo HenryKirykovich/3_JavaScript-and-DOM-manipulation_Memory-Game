@@ -103,7 +103,7 @@ function startTimer() {
 
     timerInterval = setInterval(() => {
         timeElapsed++;
-        sessionStorage.setItem("timer", timeElapsed); // ✅ Update session storage
+        sessionStorage.setItem("timer", timeElapsed); // Update session storage
         const minutes = Math.floor(timeElapsed / 60);
         const seconds = timeElapsed % 60;
         timerDisplay.textContent = `Time: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
